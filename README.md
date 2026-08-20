@@ -1,103 +1,113 @@
-# 👋 Hi, I'm David Winkler
+<div align="center">
 
-### Full-Stack Developer | Building Modern Web Applications
+```text
+██████╗  █████╗ ██╗   ██╗██╗██████╗
+██╔══██╗██╔══██╗██║   ██║██║██╔══██╗
+██║  ██║███████║██║   ██║██║██║  ██║
+██║  ██║██╔══██║╚██╗ ██╔╝██║██║  ██║
+██████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝
+╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝
+```
 
-I’m a passionate full-stack developer focused on creating scalable, high-performance applications with clean architecture and great user experiences.
+`developer` · `builder` · `AI enthusiast` · `austria 🇦🇹`
 
----
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square\&logo=github\&logoColor=white)](https://github.com/YOUR_USERNAME)
+[![Profile](https://img.shields.io/badge/Portfolio-7C3AED?style=flat-square\&logo=googlechrome\&logoColor=white)](YOUR_WEBSITE)
 
-## 🚀 About Me
-
-- 💻 Full-stack web developer
-- ⚡ Building fast and scalable applications
-- 🌱 Constantly learning new technologies
-- 🔥 Passionate about backend systems & frontend experiences
-- 🛠 Love solving real-world problems through code
-
----
-
-# 🛠 Tech Stack
-
-## Frontend
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Next JS](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=next.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
-
-## Backend
-![NodeJS](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![ExpressJS](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
-![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)
-
-## Database & Cloud
-![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)
-![AWS](https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white)
+</div>
 
 ---
 
-# 📌 Featured Projects
+### `~/about`
 
-## 🚀 Project One
-Brief description about your project and what it solves.
+> building things, breaking things, understanding how they work.
 
-### Tech Used
-- React
-- Node.js
-- PostgreSQL
+I'm **David Winkler**, a developer interested in software, AI and creating things that are actually useful.
+
+Currently learning, experimenting and turning ideas into projects.
 
 ---
 
-## 🚀 Project Two
-Short description about your awesome app or platform.
+### `~/projects`
 
-### Tech Used
-- Next.js
-- Prisma
-- TailwindCSS
+**`01` — AI & Automation**
+Building with LLMs, AI agents and automated workflows.
 
----
+`Python` `APIs` `LLMs` `Automation`
 
-## 🚀 Project Three
-Describe your favorite open-source or personal project.
+**`02` — Web Applications**
+Creating modern applications from the first idea to deployment.
 
-### Tech Used
-- TypeScript
-- Express
-- MongoDB
+`TypeScript` `React` `Next.js`
 
----
+**`03` — Experiments**
+Small projects, prototypes and random ideas that turn into something bigger.
 
-# 📊 GitHub Stats
-
-![](https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&theme=tokyonight)
-
-![](https://github-readme-stats.vercel.app/api/top-langs/?username=YOUR_USERNAME&layout=compact&theme=tokyonight)
+`JavaScript` `Python` `Docker`
 
 ---
 
-# 🌐 Connect With Me
+### `~/stack`
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?style=for-the-badge&logo=linkedin)](https://linkedin.com/in/yourprofile)
-
-[![Portfolio](https://img.shields.io/badge/Portfolio-000?style=for-the-badge&logo=vercel)](https://yourwebsite.com)
-
-[![Twitter](https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/yourhandle)
-
----
-
-# ⚡ Fun Fact
-
-```js
-while(alive) {
-   eat();
-   sleep();
-   code();
-   repeat();
-}
+```text
+lang     →  Python · JavaScript · TypeScript · HTML · CSS
+backend  →  Node.js · FastAPI · REST APIs
+frontend →  React · Next.js · Tailwind CSS
+ai/llm   →  OpenAI · Claude · Gemini · RAG · AI Agents
+database →  PostgreSQL · SQLite · MongoDB
+tools    →  Git · GitHub · Docker · VS Code · Linux
 ```
 
 ---
 
-> “First, solve the problem. Then, write the code.”
+### `~/currently`
+
+```text
+[+] building
+[+] learning
+[+] experimenting with AI
+[+] exploring new technologies
+[+] turning ideas into projects
+```
+
+---
+
+### `~/stats`
+
+<div align="center">
+
+<img src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&hide_border=true&bg_color=00000000&title_color=8B5CF6&icon_color=A78BFA&text_color=9CA3AF&rank_icon=github" />
+
+<br>
+
+<img src="https://github-readme-streak-stats.herokuapp.com/?user=YOUR_USERNAME&hide_border=true&background=00000000&ring=8B5CF6&fire=A78BFA&currStreakLabel=8B5CF6&sideLabels=9CA3AF&dates=6B7280" />
+
+</div>
+
+---
+
+### `~/contact`
+
+```text
+github   →  github.com/YOUR_USERNAME
+website  →  YOUR_WEBSITE
+email    →  YOUR_EMAIL
+```
+
+---
+
+<div align="center">
+
+```text
+$ whoami
+
+David Winkler
+
+$ echo "keep building"
+
+keep building.
+```
+
+**`[ made with curiosity + caffeine ]`**
+
+</div>
