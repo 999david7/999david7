@@ -1,113 +1,91 @@
 <div align="center">
 
 ```text
-██████╗  █████╗ ██╗   ██╗██╗██████╗
-██╔══██╗██╔══██╗██║   ██║██║██╔══██╗
-██║  ██║███████║██║   ██║██║██║  ██║
-██║  ██║██╔══██║╚██╗ ██╔╝██║██║  ██║
-██████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝
-╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝
+▓▓▓▓▓  ▓▓▓▓▓  ▓▓   ▓▓  ▓▓▓▓▓  ▓▓▓▓▓  ▓▓▓▓▓
+▓      ▓     ▓ ▓▓ ▓▓   ▓     ▓   ▓   ▓
+▓      ▓▓▓▓▓▓  ▓ ▓ ▓▓   ▓▓▓▓▓▓   ▓   ▓▓▓▓
+▓      ▓     ▓ ▓   ▓▓   ▓     ▓   ▓   ▓
+▓▓▓▓▓  ▓     ▓ ▓   ▓▓   ▓▓▓▓▓  ▓   ▓▓▓▓▓
 ```
 
-`developer` · `builder` · `AI enthusiast` · `austria 🇦🇹`
-
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square\&logo=github\&logoColor=white)](https://github.com/YOUR_USERNAME)
-[![Profile](https://img.shields.io/badge/Portfolio-7C3AED?style=flat-square\&logo=googlechrome\&logoColor=white)](YOUR_WEBSITE)
+<span style="color:#a855f7">`developer`</span> · <span style="color:#c084fc">`builder`</span> · <span style="color:#a855f7">`AI enthusiast`</span> · <span style="color:#c084fc">`Austria, AT`</span>
 
 </div>
 
----
+<span style="color:#a855f7">**999david**</span>
 
-### `~/about`
+`David Winkler`
 
-> building things, breaking things, understanding how they work.
-
-I'm **David Winkler**, a developer interested in software, AI and creating things that are actually useful.
-
-Currently learning, experimenting and turning ideas into projects.
+<span style="color:#c084fc">building things · breaking things · learning things</span>
 
 ---
 
-### `~/projects`
+### `<span style="color:#a855f7">~/projects</span>`
 
-**`01` — AI & Automation**
-Building with LLMs, AI agents and automated workflows.
+**AI & Automation**
+AI-powered tools, agents and automation experiments
+`Python` `FastAPI` `LLMs` `RAG`
 
-`Python` `APIs` `LLMs` `Automation`
+**Web Projects**
+Building applications and experimenting with new ideas
+`TypeScript` `JavaScript` `React` `Next.js`
 
-**`02` — Web Applications**
-Creating modern applications from the first idea to deployment.
-
-`TypeScript` `React` `Next.js`
-
-**`03` — Experiments**
-Small projects, prototypes and random ideas that turn into something bigger.
-
-`JavaScript` `Python` `Docker`
+**Random Stuff**
+Side projects, experiments and things I build because I can
+`Python` `Docker` `Git`
 
 ---
 
-### `~/stack`
+### `<span style="color:#a855f7">~/stack</span>`
 
 ```text
-lang     →  Python · JavaScript · TypeScript · HTML · CSS
-backend  →  Node.js · FastAPI · REST APIs
-frontend →  React · Next.js · Tailwind CSS
-ai/llm   →  OpenAI · Claude · Gemini · RAG · AI Agents
+lang     →  Python · JavaScript · TypeScript
+backend  →  FastAPI · Node.js · REST APIs
+frontend →  React · Next.js · HTML · CSS
+ai/llm   →  OpenAI · Claude · Gemini · RAG
 database →  PostgreSQL · SQLite · MongoDB
-tools    →  Git · GitHub · Docker · VS Code · Linux
+tools    →  Git · GitHub · Docker · Linux · VS Code
 ```
 
 ---
 
-### `~/currently`
+### `<span style="color:#a855f7">~/currently</span>`
 
 ```text
 [+] building
 [+] learning
-[+] experimenting with AI
-[+] exploring new technologies
-[+] turning ideas into projects
+[+] experimenting
+[+] making questionable engineering decisions
 ```
 
 ---
 
-### `~/stats`
+### `<span style="color:#a855f7">~/stats</span>`
 
 <div align="center">
 
-<img src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&hide_border=true&bg_color=00000000&title_color=8B5CF6&icon_color=A78BFA&text_color=9CA3AF&rank_icon=github" />
+<img src="https://github-readme-stats.vercel.app/api?username=999david&show_icons=true&hide_border=true&bg_color=0d1117&title_color=a855f7&icon_color=c084fc&text_color=c9d1d9&ring_color=a855f7" />
 
-<br>
-
-<img src="https://github-readme-streak-stats.herokuapp.com/?user=YOUR_USERNAME&hide_border=true&background=00000000&ring=8B5CF6&fire=A78BFA&currStreakLabel=8B5CF6&sideLabels=9CA3AF&dates=6B7280" />
+<img src="https://github-readme-streak-stats.herokuapp.com/?user=999david&hide_border=true&background=0d1117&ring=a855f7&fire=c084fc&currStreakLabel=a855f7&sideLabels=c084fc&currStreakNum=c9d1d9&sideNums=c9d1d9&dates=6b7280" />
 
 </div>
 
 ---
 
-### `~/contact`
-
-```text
-github   →  github.com/YOUR_USERNAME
-website  →  YOUR_WEBSITE
-email    →  YOUR_EMAIL
-```
-
----
+<span style="color:#a855f7">`HTL · Austria · software · AI · whatever comes next`</span>
 
 <div align="center">
 
 ```text
 $ whoami
 
-David Winkler
+999david
 
 $ echo "keep building"
 
 keep building.
 ```
 
-**`[ made with curiosity + caffeine ]`**
+<span style="color:#a855f7">✦</span> <span style="color:#c084fc">made with curiosity</span> <span style="color:#a855f7">✦</span>
 
 </div>
