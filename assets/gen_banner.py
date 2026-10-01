@@ -1,4 +1,8 @@
-"""Generate assets/banner.txt and assets/banner.svg (ANSI-shadow 'DAVID W.')."""
+"""Generate assets/banner.svg and assets/footer.svg (ANSI-shadow 'DAVID W.').
+
+The art is drawn as SVG geometry instead of text: GitHub renders the block and
+box-drawing characters from mismatched fallback fonts, so a text copy drifts.
+"""
 from pathlib import Path
 
 GLYPHS = {
@@ -17,7 +21,6 @@ rows = ["".join(GLYPHS[c][r] for c in TEXT).rstrip() for r in range(6)]
 width = max(len(r) for r in rows)
 rows = [r.ljust(width) for r in rows]
 here = Path(__file__).parent
-(here / "banner.txt").write_text("\n".join(r.rstrip() for r in rows) + "\n")
 
 # --- SVG: every cell drawn as geometry, so alignment never depends on fonts ---
 CW, CH = 12, 22          # cell size
@@ -132,3 +135,38 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewB
 (here / "banner.svg").write_text(svg)
 print("\n".join(rows))
 print(W, H)
+
+# --- footer: static terminal showing `cat ~/banner.txt` -----------------------
+FY = 74                                  # top of the art
+fblocks, flines = [], []
+for ri, row in enumerate(rows):
+    for ci, ch in enumerate(row):
+        x, y = PADX + ci * CW, FY + ri * CH
+        if ch == "█":
+            fblocks.append(f'<rect x="{x}" y="{y}" width="{CW+0.4}" height="{CH+0.4}"/>')
+        elif ch in BOX:
+            flines.append(box_path(ch, x, y))
+FH = FY + 6 * CH + 96
+MONO = "'JetBrains Mono','Fira Code',ui-monospace,Menlo,Consolas,monospace"
+footer = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{FH}" viewBox="0 0 {W} {FH}" role="img" aria-label="$ cat ~/banner.txt: {TEXT}">
+<defs>
+  <linearGradient id="fg" gradientUnits="userSpaceOnUse" x1="{PADX}" y1="0" x2="{PADX+ART_W}" y2="0">
+    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#c084fc"/><stop offset="1" stop-color="#7c3aed"/>
+  </linearGradient>
+  <style>
+    text {{ font: 600 15px {MONO}; }}
+    .cursor {{ animation: blink 1s steps(1) infinite; }}
+    @keyframes blink {{ 50% {{ opacity:0; }} }}
+  </style>
+</defs>
+<rect width="{W}" height="{FH}" rx="14" fill="#0d1117"/>
+<rect x="0.5" y="0.5" width="{W-1}" height="{FH-1}" rx="14" fill="none" stroke="#7c3aed" stroke-opacity="0.7"/>
+<circle cx="20" cy="18" r="5" fill="#ff5f56"/><circle cx="37" cy="18" r="5" fill="#ffbd2e"/><circle cx="54" cy="18" r="5" fill="#27c93f"/>
+<text x="{PADX}" y="54" fill="#c084fc">$ <tspan fill="#c9d1d9">cat ~/banner.txt</tspan></text>
+<path d="{" ".join(flines)}" fill="none" stroke="#6b21a8" stroke-width="1.6" stroke-linecap="square"/>
+<g fill="url(#fg)">{"".join(fblocks)}</g>
+<text x="{PADX}" y="{FY + 6*CH + 44}" fill="#c084fc">$ <tspan fill="#c9d1d9">echo "keep building"</tspan></text>
+<text x="{PADX}" y="{FY + 6*CH + 70}" fill="#c9d1d9">keep building.<tspan class="cursor" fill="#e879f9"> █</tspan></text>
+</svg>
+'''
+(here / "footer.svg").write_text(footer)

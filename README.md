@@ -113,19 +113,7 @@ ai/llm   →  OpenAI · Claude · Gemini · RAG
 
 <div align="center">
 
-```text
-$ cat ~/banner.txt
-
-██████╗  █████╗ ██╗   ██╗██╗██████╗     ██╗    ██╗
-██╔══██╗██╔══██╗██║   ██║██║██╔══██╗    ██║    ██║
-██║  ██║███████║██║   ██║██║██║  ██║    ██║ █╗ ██║
-██║  ██║██╔══██║╚██╗ ██╔╝██║██║  ██║    ██║███╗██║
-██████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝    ╚███╔███╔╝██╗
-╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝      ╚══╝╚══╝ ╚═╝
-
-$ echo "keep building"
-keep building.
-```
+<img src="./assets/footer.svg" width="100%" alt="$ cat ~/banner.txt — DAVID W." />
 
 <sub>✦ made with curiosity ✦</sub>
 
