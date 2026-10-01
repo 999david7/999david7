@@ -1,7 +1,7 @@
 <!-- ░░░ HEADER ░░░ -->
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0d1117,50:7c3aed,100:c084fc&height=220&section=header&text=David%20Winkler&fontSize=62&fontColor=ffffff&fontAlignY=38&desc=999david7%20%C2%B7%20developer%20%C2%B7%20builder%20%C2%B7%20AI%20enthusiast&descAlignY=60&descSize=18&animation=fadeIn" width="100%" alt="header" />
+<img src="./assets/banner.svg" width="100%" alt="DAVID 999" />
 
 <a href="https://github.com/999david7">
   <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&pause=1000&color=A855F7&center=true&vCenter=true&width=600&lines=building+things.;breaking+things.;learning+things.;making+questionable+engineering+decisions." alt="typing" />
@@ -112,7 +112,16 @@ ai/llm   →  OpenAI · Claude · Gemini · RAG
 
 <div align="center">
 
-```console
+```text
+$ cat ~/banner.txt
+
+██████╗  █████╗ ██╗   ██╗██╗██████╗      █████╗  █████╗  █████╗
+██╔══██╗██╔══██╗██║   ██║██║██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗
+██║  ██║███████║██║   ██║██║██║  ██║    ╚██████║╚██████║╚██████║
+██║  ██║██╔══██║╚██╗ ██╔╝██║██║  ██║     ╚═══██║ ╚═══██║ ╚═══██║
+██████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝     █████╔╝ █████╔╝ █████╔╝
+╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝      ╚════╝  ╚════╝  ╚════╝
+
 $ echo "keep building"
 keep building.
 ```
