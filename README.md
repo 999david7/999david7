@@ -26,7 +26,7 @@
 name:      David Winkler
 handle:    999david7
 location:  Austria 🇦🇹
-school:    HTL
+school:    HTL Anichstraße
 focus:     [software, AI, automation, whatever comes next]
 motto:     "keep building."
 ```
