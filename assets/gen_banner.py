@@ -1,4 +1,4 @@
-"""Generate assets/banner.txt and assets/banner.svg (ANSI-shadow 'DAVID 999')."""
+"""Generate assets/banner.txt and assets/banner.svg (ANSI-shadow 'DAVID W.')."""
 from pathlib import Path
 
 GLYPHS = {
@@ -7,9 +7,11 @@ GLYPHS = {
     "V": ["██╗   ██╗", "██║   ██║", "██║   ██║", "╚██╗ ██╔╝", " ╚████╔╝ ", "  ╚═══╝  "],
     "I": ["██╗", "██║", "██║", "██║", "██║", "╚═╝"],
     "9": [" █████╗ ", "██╔══██╗", "╚██████║", " ╚═══██║", " █████╔╝", " ╚════╝ "],
+    "W": ["██╗    ██╗", "██║    ██║", "██║ █╗ ██║", "██║███╗██║", "╚███╔███╔╝", " ╚══╝╚══╝ "],
+    ".": ["   ", "   ", "   ", "   ", "██╗", "╚═╝"],
     " ": ["    "] * 6,
 }
-TEXT = "DAVID 999"
+TEXT = "DAVID W."
 
 rows = ["".join(GLYPHS[c][r] for c in TEXT).rstrip() for r in range(6)]
 width = max(len(r) for r in rows)
@@ -65,7 +67,7 @@ band_svg = "\n".join(
 )
 
 ART_W = width * CW
-svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="DAVID 999">
+svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{TEXT}">
 <defs>
   <linearGradient id="grad" gradientUnits="userSpaceOnUse" x1="{PADX}" y1="0" x2="{PADX+ART_W}" y2="0">
     <stop offset="0" stop-color="#7c3aed"/>

@@ -1,7 +1,7 @@
 <!-- ░░░ HEADER ░░░ -->
 <div align="center">
 
-<img src="./assets/banner.svg" width="100%" alt="DAVID 999" />
+<img src="./assets/banner.svg" width="100%" alt="DAVID W." />
 
 <a href="https://github.com/999david7">
   <img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=22&pause=1000&color=A855F7&center=true&vCenter=true&width=600&lines=building+things.;breaking+things.;learning+things.;making+questionable+engineering+decisions." alt="typing" />
@@ -115,12 +115,12 @@ ai/llm   →  OpenAI · Claude · Gemini · RAG
 ```text
 $ cat ~/banner.txt
 
-██████╗  █████╗ ██╗   ██╗██╗██████╗      █████╗  █████╗  █████╗
-██╔══██╗██╔══██╗██║   ██║██║██╔══██╗    ██╔══██╗██╔══██╗██╔══██╗
-██║  ██║███████║██║   ██║██║██║  ██║    ╚██████║╚██████║╚██████║
-██║  ██║██╔══██║╚██╗ ██╔╝██║██║  ██║     ╚═══██║ ╚═══██║ ╚═══██║
-██████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝     █████╔╝ █████╔╝ █████╔╝
-╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝      ╚════╝  ╚════╝  ╚════╝
+██████╗  █████╗ ██╗   ██╗██╗██████╗     ██╗    ██╗
+██╔══██╗██╔══██╗██║   ██║██║██╔══██╗    ██║    ██║
+██║  ██║███████║██║   ██║██║██║  ██║    ██║ █╗ ██║
+██║  ██║██╔══██║╚██╗ ██╔╝██║██║  ██║    ██║███╗██║
+██████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝    ╚███╔███╔╝██╗
+╚═════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝      ╚══╝╚══╝ ╚═╝
 
 $ echo "keep building"
 keep building.
