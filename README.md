@@ -1,6 +1,8 @@
 <!-- ░░░ HEADER ░░░ -->
 <div align="center">
 
+<img src="./assets/title.svg" width="100%" alt="Tutte le cose belle prima o poi finiscono." />
+
 <img src="./assets/banner.svg" width="100%" alt="DAVID W." />
 
 <a href="https://github.com/999david7">
