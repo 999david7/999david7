@@ -94,7 +94,6 @@ ai/llm   →  OpenAI · Claude · Gemini · RAG
 
 <img src="https://github-readme-streak-stats.herokuapp.com/?user=999david7&hide_border=true&background=0d1117&ring=a855f7&fire=c084fc&currStreakLabel=a855f7&sideLabels=c084fc&currStreakNum=c9d1d9&sideNums=c9d1d9&dates=6b7280" />
 
-<img src="https://github-readme-activity-graph.vercel.app/graph?username=999david7&bg_color=0d1117&color=c084fc&line=a855f7&point=ffffff&area=true&area_color=7c3aed&hide_border=true" width="100%" />
 
 </div>
 
