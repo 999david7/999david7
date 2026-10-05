@@ -1,14 +1,14 @@
-"""Generate the README cards in the style of the portfolio (paper and ink).
+"""Generate the README cards in the portfolio's theme (paper and ink).
 
 Run: python3 assets/gen_assets.py   (needs: pip install fonttools brotli)
 
-README images can't load web fonts, so each SVG embeds a subset of the
-portfolio's fonts (League Gothic, Cormorant Garamond, Shadows Into Light).
-Text widths are measured from the font files so wrapping and alignment match.
+Same palette and fonts as the portfolio (League Gothic, Cormorant Garamond,
+Shadows Into Light), own content and layout. README images can't load web
+fonts, so each SVG embeds a subset of them. Text widths are measured from the
+font files so wrapping and alignment match.
 """
 import base64
 import io
-import re
 from pathlib import Path
 
 from fontTools import subset
@@ -18,38 +18,28 @@ HERE = Path(__file__).parent
 
 # --- content ---------------------------------------------------------------------
 QUOTE = "Tutte le cose belle prima o poi finiscono."
-NAME = "David Winkler"
-CAPTION = ["Software engineer & designer", "Innsbruck, Austria"]
-LEAD = "From Innsbruck. I build programs that are fast, clean, and just work."
-DIM = [
-    "Most of what I do sits where engineering meets design — interfaces that load "
-    "instantly, read clearly, and feel good to use. Your mentality is your limit.",
-    "Currently studying at HTL Anichstraße, running bean4U, and taking on freelance "
-    "work in web development and UI.",
+NAME = "David W."
+HANDLE = "@999david7"
+TAGLINE = "building things \u00b7 breaking things \u00b7 learning things"
+ROLES = "Developer \u00b7 Builder \u00b7 AI enthusiast"
+PLACE = "Innsbruck, Austria"
+SCHOOL = "HTL Anichstra\u00dfe"
+PROJECTS = [
+    ("AI & Automation", "AI-powered tools, agents and automation experiments.", ["Python", "FastAPI", "LLMs", "RAG"]),
+    ("Web Projects", "Building applications and experimenting with new ideas.", ["TypeScript", "React", "Next.js"]),
+    ("Random Stuff", "Side projects, experiments and things I build because I can.", ["Python", "Docker", "Git"]),
 ]
-EDUCATION = [("HTL Anichstraße", "Technical college in Innsbruck — engineering fundamentals", "Since 2025")]
 STACK = [
-    ("Languages", [("javascript", "#E8C800", "JavaScript"), ("typescript", "#3178C6", "TypeScript"),
-                   ("openjdk", "#ED8B00", "Java"), ("python", "#3776AB", "Python"),
-                   ("cplusplus", "#00599C", "C++"), ("html5", "#E34F26", "HTML"), ("css", "#663399", "CSS")]),
-    ("Back end", [("nodedotjs", "#5FA04E", "Node.js"), ("express", None, "Express")]),
-    ("Tools", [("git", "#F03C2E", "Git"), ("linux", None, "Linux"), ("gnubash", "#4EAA25", "Bash"),
-               ("figma", "#F24E1E", "Figma"), ("ollama", None, "Ollama")]),
-    ("AI", [("claude", "#D97757", "Claude Code"), ("openai", None, "ChatGPT"), ("googlegemini", "#8E75B2", "Gemini")]),
+    ("Languages", "Python \u00b7 JavaScript \u00b7 TypeScript"),
+    ("Back end", "FastAPI \u00b7 Node.js \u00b7 REST"),
+    ("Front end", "React \u00b7 Next.js \u00b7 HTML \u00b7 CSS"),
+    ("AI", "Claude \u00b7 OpenAI \u00b7 Gemini \u00b7 RAG"),
+    ("Data", "PostgreSQL \u00b7 SQLite \u00b7 MongoDB"),
+    ("Tools", "Git \u00b7 Docker \u00b7 Linux \u00b7 VS Code"),
 ]
-WORK = [
-    ("Cortex", "A code editor that runs your own local models.", "2026"),
-    ("bean4U", "Coffee recipes, brewing guides, and a brand built from scratch.", "2024 — Present"),
-    ("Formula Arch", "Arch Linux, dressed in Formula 1 liveries.", "2026"),
-    ("Portfolio", "This site — static pages and a small hardened API.", "2025"),
-]
-PATH = [
-    ("Student", "HTL Anichstraße — technical college in Innsbruck", "2025 — now"),
-    ("Founder", "bean4U — coffee recipe platform, brand and all", "2024 — now"),
-    ("Freelance developer", "Web development and UI for clients", "Now"),
-]
-LINKS = ["Email", "GitHub", "Instagram", "CV"]
-COPY = "© 2026 · David Winkler"
+CURRENTLY = ["building", "learning", "experimenting", "making questionable engineering decisions"]
+MOTTO = "keep building."
+
 
 # --- palette (portfolio :root) -----------------------------------------------------
 BG, INK = "#FCFBF8", "#17140F"
@@ -172,97 +162,96 @@ text {{ fill: {INK}; }}
         print(f"{name}.svg  {len(svg) // 1024} KB")
 
 
-def rows(c, y, items, name_font, name_size, upper):
-    """Portfolio .row list: name + note on the left, year on the right, hairlines between."""
-    for name, note, year in items:
-        c.hline(y)
-        top = y + 30
-        c.text(PAD, top + name_size * 0.72, name, name_font, name_size, ls=0.02 if upper else 0, upper=upper)
-        c.text(W - PAD, top + name_size * 0.72, year, "serif", 17, FAINT, anchor="end")
-        c.text(PAD, top + name_size * 0.72 + 30, note, "serif", 18, MUTED)
-        y = top + name_size * 0.72 + 30 + 28
-    c.hline(y)
-    return y
+
+def rule(c, y, op=1.0, h=1.0, x0=PAD, x1=W - PAD):
+    c.els.append(f'<rect x="{x0}" y="{y:.1f}" width="{x1 - x0}" height="{h}" fill="{INK}" fill-opacity="{op}"/>')
 
 
-# --- hero ----------------------------------------------------------------------------
+def caps(c, x, y, s, size=13, op=FAINT, anchor="start"):
+    c.text(x, y, s, "serif", size, op, ls=0.22, anchor=anchor, upper=True)
+
+
+# --- masthead ------------------------------------------------------------------------
 c = Card()
-c.text(W / 2, 74, QUOTE, "italic", 26, anchor="middle")
+caps(c, PAD, 58, f"Nº 999 — {PLACE}")
+c.text(W - PAD, 58, HANDLE, "italic", 16, MUTED, anchor="end")
+rule(c, 72, 0.9, 2)
+rule(c, 77, 0.9, 0.75)
 c.rise()
-pw, ph, py = 140, 175, 120
-portrait = base64.b64encode((HERE / "portrait.webp").read_bytes()).decode()
-c.defs.append(f'<clipPath id="pc"><rect x="{(W - pw) / 2}" y="{py}" width="{pw}" height="{ph}" rx="14"/></clipPath>'
-              f'<filter id="sh" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="{INK}" flood-opacity="0.28"/></filter>')
-c.els.append(f'<rect x="{(W - pw) / 2 + 8}" y="{py + 8}" width="{pw - 16}" height="{ph - 16}" rx="14" fill="{BG}" filter="url(#sh)"/>'
-             f'<image href="data:image/webp;base64,{portrait}" x="{(W - pw) / 2}" y="{py}" width="{pw}" height="{ph}" '
-             f'preserveAspectRatio="xMidYMid slice" clip-path="url(#pc)"/>')
+c.text(W / 2, 130, QUOTE, "italic", 26, anchor="middle")
 c.rise()
-c.text(W / 2, py + ph + 132, NAME, "display", 128, ls=0.09, anchor="middle", upper=True)
+c.text(W / 2, 318, NAME, "display", 190, ls=0.06, anchor="middle", upper=True)
 c.rise()
-for i, line in enumerate(CAPTION):
-    c.text(W / 2, py + ph + 192 + i * 40, line, "script", 32, anchor="middle")
+rule(c, 352, 0.9, 0.75)
+rule(c, 357, 0.9, 2)
+c.text(W / 2, 410, TAGLINE, "script", 30, anchor="middle")
 c.rise()
-c.save("hero", py + ph + 192 + 40 + 56, f"{QUOTE} {NAME} — {CAPTION[0]}, {CAPTION[1]}")
+caps(c, PAD, 462, ROLES)
+c.text(W - PAD, 462, SCHOOL, "italic", 16, MUTED, anchor="end")
+c.rise()
+c.save("hero", 500, f"{QUOTE} {NAME} ({HANDLE}) — {TAGLINE}. {ROLES}, {PLACE}.")
 
-# --- about + education -------------------------------------------------------------
+# --- projects --------------------------------------------------------------------------
 c = Card()
-c.label(PAD + 10, "About")
+caps(c, PAD, PAD + 8, "Projects", 15)
+rule(c, PAD + 30, LINE)
 c.rise()
-y = c.para(PAD, PAD + 62, LEAD, "serif", 27, 640, 38)
-c.rise()
-for p in DIM:
-    y = c.para(PAD, y + 14, p, "serif", 23, 640, 33, MUTED)
-c.rise()
-y += 34
-c.label(y, "Education")
-y = rows(c, y + 30, EDUCATION, "serif", 30, False)
-c.rise()
-c.save("about", y + PAD - 10, "About David Winkler")
-
-# --- stack -----------------------------------------------------------------------------
-sprite = (HERE / "stack-icons.svg").read_text()
-symbols = dict(re.findall(r'<symbol id="([^"]+)" viewBox="0 0 24 24">(.*?)</symbol>', sprite, re.S))
-c = Card()
-c.label(PAD + 10, "Stack")
-c.hline(PAD + 38)
-c.rise()
-gap = 28
-colw = (W - 2 * PAD - 3 * gap) / 4
+gap = 40
+colw = (W - 2 * PAD - 2 * gap) / 3
+serif = c.fonts["serif"]
 bottom = 0
-for gi, (group, items) in enumerate(STACK):
-    x = PAD + gi * (colw + gap)
-    y = PAD + 80
-    c.text(x, y, group, "serif", 13, FAINT, ls=0.2, upper=True)
-    y += 22
-    for icon, brand, name in items:
-        c.els.append(f'<rect x="{x + 0.5:.1f}" y="{y + 0.5:.1f}" width="35" height="35" rx="10" fill="#fff" stroke="{INK}" stroke-opacity="{LINE}"/>'
-                     f'<g transform="translate({x + 8.5:.1f} {y + 8.5:.1f}) scale(0.8)" fill="{brand or INK}">{symbols[icon]}</g>')
-        c.text(x + 48, y + 24, name, "serif", 20)
-        y += 47
-    bottom = max(bottom, y)
+for i, (title, desc, tags) in enumerate(PROJECTS):
+    x = PAD + i * (colw + gap)
+    c.text(x, PAD + 122, f"0{i + 1}", "display", 64, 0.16)
+    c.text(x, PAD + 168, title, "serif5", 27)
+    y = c.para(x, PAD + 200, desc, "serif", 19, colw, 26, MUTED)
+    line = ""
+    for t in tags:                                   # wrap the tag run at measured caps width
+        test = f"{line} · {t}" if line else t
+        if serif.width(test.upper(), 12, 0.22) > colw and line:
+            caps(c, x, y + 16, line, 12)
+            y, test = y + 20, t
+        line = test
+    caps(c, x, y + 16, line, 12)
+    bottom = max(bottom, y + 20)
     c.rise()
-c.save("stack", bottom + PAD - 20, "Stack: " + "; ".join(f"{g}: " + ", ".join(n for *_, n in it) for g, it in STACK))
+for i in (1, 2):
+    x = PAD + i * (colw + gap) - gap / 2
+    c.els.append(f'<rect x="{x:.1f}" y="{PAD + 62}" width="1" height="{bottom - PAD - 52:.0f}" fill="{INK}" fill-opacity="{LINE}"/>')
+c.save("projects", bottom + PAD, "Projects: " + "; ".join(f"{t} — {d} ({', '.join(g)})" for t, d, g in PROJECTS))
 
-# --- work ------------------------------------------------------------------------------
+# --- stack, currently, sign-off --------------------------------------------------------
 c = Card()
-c.label(PAD + 10, "Work")
+lw = 470
+caps(c, PAD, PAD + 8, "Stack", 15)
+rule(c, PAD + 30, LINE, x1=PAD + lw)
+y = PAD + 72
+serif = c.fonts["serif"]
+for key, val in STACK:
+    caps(c, PAD, y, key, 12)
+    vw = serif.width(val, 19)
+    kx = PAD + serif.width(key.upper(), 12, 0.22) + 10
+    dots = "." * int((PAD + lw - vw - 18 - kx) / serif.width(".", 14))
+    c.text(kx, y, dots, "serif", 14, LINE * 2.5)
+    c.text(PAD + lw, y, val, "serif", 19, anchor="end")
+    y += 38
 c.rise()
-y = rows(c, PAD + 38, [(n, note, yr + "  ↗") for n, note, yr in WORK], "display", 50, True)
+rx = PAD + lw + 56
+caps(c, rx, PAD + 8, "Currently", 15)
+rule(c, PAD + 30, LINE, x0=rx)
+cy = PAD + 76
+for item in CURRENTLY:
+    for j, line in enumerate(c.wrap(item, "script", 26, W - PAD - rx - 26)):
+        if j == 0:
+            c.text(rx, cy, "—", "serif", 20, FAINT)
+        c.text(rx + 26, cy, line, "script", 26)
+        cy += 34
+    cy += 4
 c.rise()
-c.save("work", y + PAD - 10, "Work: " + "; ".join(f"{n} ({yr}) — {note}" for n, note, yr in WORK))
-
-# --- path + footer ---------------------------------------------------------------------
-c = Card()
-c.label(PAD + 10, "Path")
+fy = max(y, cy) + 18
+rule(c, fy, LINE)
+c.text(PAD, fy + 62, MOTTO, "italic", 30)
+c.text(W - PAD, fy + 64, f"— {NAME}", "script", 38, anchor="end")
 c.rise()
-y = rows(c, PAD + 38, PATH, "serif5", 26, False)
-c.rise()
-fy = y + 130
-c.els.append('<g class="sign">')
-c.text(PAD, fy, NAME, "script", 50)
-c.els.append("</g>")
-lx = W / 2 + 20
-for i, link in enumerate(LINKS):
-    c.text(lx, fy - 66 + i * 27, link, "serif", 19, MUTED)
-c.text(W - PAD, fy + 14, COPY, "serif", 16, FAINT, anchor="end")
-c.save("contact", fy + 14 + PAD - 10, f"Path: {', '.join(p[0] for p in PATH)}. Signed, {NAME}.")
+c.save("index", fy + 64 + PAD - 18, "Stack: " + "; ".join(f"{k}: {v}" for k, v in STACK)
+       + ". Currently: " + ", ".join(CURRENTLY) + f". {MOTTO}")
