@@ -1,357 +1,268 @@
-"""Generate the README artwork: banner, whoami, projects and footer SVGs.
+"""Generate the README cards in the style of the portfolio (paper and ink).
 
-Run: python3 assets/gen_assets.py
+Run: python3 assets/gen_assets.py   (needs: pip install fonttools brotli)
 
-The art is drawn as SVG geometry instead of text: GitHub renders the block and
-box-drawing characters from mismatched fallback fonts, so a text copy drifts.
+README images can't load web fonts, so each SVG embeds a subset of the
+portfolio's fonts (League Gothic, Cormorant Garamond, Shadows Into Light).
+Text widths are measured from the font files so wrapping and alignment match.
 """
-import random
+import base64
+import io
+import re
 from pathlib import Path
 
-GLYPHS = {
-    "D": ["██████╗ ", "██╔══██╗", "██║  ██║", "██║  ██║", "██████╔╝", "╚═════╝ "],
-    "A": [" █████╗ ", "██╔══██╗", "███████║", "██╔══██║", "██║  ██║", "╚═╝  ╚═╝"],
-    "V": ["██╗   ██╗", "██║   ██║", "██║   ██║", "╚██╗ ██╔╝", " ╚████╔╝ ", "  ╚═══╝  "],
-    "I": ["██╗", "██║", "██║", "██║", "██║", "╚═╝"],
-    "9": [" █████╗ ", "██╔══██╗", "╚██████║", " ╚═══██║", " █████╔╝", " ╚════╝ "],
-    "W": ["██╗    ██╗", "██║    ██║", "██║ █╗ ██║", "██║███╗██║", "╚███╔███╔╝", " ╚══╝╚══╝ "],
-    ".": ["   ", "   ", "   ", "   ", "██╗", "╚═╝"],
-    " ": ["    "] * 6,
-}
-TEXT = "DAVID W."
+from fontTools import subset
+from fontTools.ttLib import TTFont
 
-rows = ["".join(GLYPHS[c][r] for c in TEXT).rstrip() for r in range(6)]
-width = max(len(r) for r in rows)
-rows = [r.ljust(width) for r in rows]
-here = Path(__file__).parent
+HERE = Path(__file__).parent
 
-# --- SVG: every cell drawn as geometry, so alignment never depends on fonts ---
-CW, CH = 12, 22          # cell size
-PADX, PADY = 40, 36
-G = 2.6                  # half-gap of double lines
-W, H = width * CW + 2 * PADX, 6 * CH + 2 * PADY + 74
+# --- content ---------------------------------------------------------------------
+QUOTE = "Tutte le cose belle prima o poi finiscono."
+NAME = "David Winkler"
+CAPTION = ["Software engineer & designer", "Innsbruck, Austria"]
+LEAD = "From Innsbruck. I build programs that are fast, clean, and just work."
+DIM = [
+    "Most of what I do sits where engineering meets design — interfaces that load "
+    "instantly, read clearly, and feel good to use. Your mentality is your limit.",
+    "Currently studying at HTL Anichstraße, running bean4U, and taking on freelance "
+    "work in web development and UI.",
+]
+EDUCATION = [("HTL Anichstraße", "Technical college in Innsbruck — engineering fundamentals", "Since 2025")]
+STACK = [
+    ("Languages", [("javascript", "#E8C800", "JavaScript"), ("typescript", "#3178C6", "TypeScript"),
+                   ("openjdk", "#ED8B00", "Java"), ("python", "#3776AB", "Python"),
+                   ("cplusplus", "#00599C", "C++"), ("html5", "#E34F26", "HTML"), ("css", "#663399", "CSS")]),
+    ("Back end", [("nodedotjs", "#5FA04E", "Node.js"), ("express", None, "Express")]),
+    ("Tools", [("git", "#F03C2E", "Git"), ("linux", None, "Linux"), ("gnubash", "#4EAA25", "Bash"),
+               ("figma", "#F24E1E", "Figma"), ("ollama", None, "Ollama")]),
+    ("AI", [("claude", "#D97757", "Claude Code"), ("openai", None, "ChatGPT"), ("googlegemini", "#8E75B2", "Gemini")]),
+]
+WORK = [
+    ("Cortex", "A code editor that runs your own local models.", "2026"),
+    ("bean4U", "Coffee recipes, brewing guides, and a brand built from scratch.", "2024 — Present"),
+    ("Formula Arch", "Arch Linux, dressed in Formula 1 liveries.", "2026"),
+    ("Portfolio", "This site — static pages and a small hardened API.", "2025"),
+]
+PATH = [
+    ("Student", "HTL Anichstraße — technical college in Innsbruck", "2025 — now"),
+    ("Founder", "bean4U — coffee recipe platform, brand and all", "2024 — now"),
+    ("Freelance developer", "Web development and UI for clients", "Now"),
+]
+LINKS = ["Email", "GitHub", "Instagram", "CV"]
+COPY = "© 2026 · David Winkler"
 
-# double-line box chars: which directions they connect (l, r, u, d)
-BOX = {"═": "lr", "║": "ud", "╗": "ld", "╔": "rd", "╝": "lu", "╚": "ru"}
-
-def box_path(ch, x, y, cw=None, chh=None, g=None):
-    cw, chh, G = cw or CW, chh or CH, g or globals()["G"]
-    cx, cy = x + cw / 2, y + chh / 2
-    l, r, u, d = x, x + cw, y, y + chh
-    segs = []
-    dirs = BOX[ch]
-    if dirs == "lr":
-        segs += [f"M{l},{cy-G}H{r}", f"M{l},{cy+G}H{r}"]
-    elif dirs == "ud":
-        segs += [f"M{cx-G},{u}V{d}", f"M{cx+G},{u}V{d}"]
-    else:
-        h = l if "l" in dirs else r          # horizontal side
-        v = u if "u" in dirs else d          # vertical side
-        sx = 1 if h == r else -1             # toward horizontal side
-        sy = 1 if v == d else -1             # toward vertical side
-        # outer stroke (far from the corner) and inner stroke (near the corner)
-        ox, oy = cx - sx * G, cy - sy * G
-        ix, iy = cx + sx * G, cy + sy * G
-        segs += [f"M{h},{oy}H{ox}V{v}", f"M{h},{iy}H{ix}V{v}"]
-    return " ".join(segs)
-
-blocks, lines = [], []
-for ri, row in enumerate(rows):
-    for ci, ch in enumerate(row):
-        x, y = PADX + ci * CW, PADY + ri * CH
-        if ch == "█":
-            blocks.append((ci, f'<rect x="{x}" y="{y}" width="{CW+0.4}" height="{CH+0.4}"/>'))
-        elif ch in BOX:
-            lines.append(box_path(ch, x, y))
-
-# group blocks by column bands so they can reveal left -> right
-bands = {}
-for ci, rect in blocks:
-    bands.setdefault(ci // 4, []).append(rect)
-band_svg = "\n".join(
-    f'<g class="b" style="animation-delay:{0.04*k:.2f}s">{"".join(v)}</g>'
-    for k, v in sorted(bands.items())
-)
-
-ART_W = width * CW
-
-rng = random.Random(7)
-cells = {(PADX + ci * CW, PADY + ri * CH) for ri, row in enumerate(rows) for ci, ch in enumerate(row) if ch != " "}
-def free(x, y):
-    return (PADX + int((x - PADX) // CW) * CW, PADY + int((y - PADY) // CH) * CH) not in cells
-pts = [(rng.uniform(8, W - 8), rng.uniform(30, H - 90)) for _ in range(140)]
-pts = [p for p in pts if free(*p)][:70]
-stars = "".join(
-    f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{rng.choice([0.6, 0.8, 1, 1.3])}" '
-    f'fill="#e9d5ff" class="tw" style="animation-delay:{rng.uniform(0, 4):.2f}s;animation-duration:{rng.uniform(2, 5):.2f}s"/>'
-    for x, y in pts
-)
-
-GT = PADY + 6 * CH + 18                  # top of the grid floor (horizon)
-GH = H - GT
-VPX = W / 2
-N = 9
-def gy(k):                               # perspective spacing toward the viewer
-    return GT + GH * (k / N) ** 2
-hlines = "".join(
-    f'<rect x="0" y="{gy(k):.1f}" width="{W}" height="1" fill="#a855f7" opacity="{0.15 + 0.6 * k / N:.2f}">'
-    f'<animate attributeName="y" values="{gy(k):.1f};{gy(k+1):.1f}" dur="1.6s" repeatCount="indefinite"/></rect>'
-    for k in range(N)
-)
-vlines = "".join(
-    f'<line x1="{VPX + (i * 26):.1f}" y1="{GT}" x2="{VPX + i * 26 * 9:.1f}" y2="{H}" />'
-    for i in range(-16, 17)
-)
-grid = f'''<g clip-path="url(#frame)">
-  <rect x="0" y="{GT}" width="{W}" height="{GH}" fill="url(#floor)"/>
-  <g stroke="#a855f7" stroke-opacity="0.45" stroke-width="1">{vlines}</g>
-  {hlines}
-  <rect x="0" y="{GT-1}" width="{W}" height="2" fill="#f0abfc" filter="url(#glow)" opacity="0.9"/>
-</g>'''
-
-svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-label="{TEXT}">
-<defs>
-  <linearGradient id="grad" gradientUnits="userSpaceOnUse" x1="{PADX}" y1="0" x2="{PADX+ART_W}" y2="0">
-    <stop offset="0" stop-color="#7c3aed"/>
-    <stop offset="0.35" stop-color="#c084fc"/>
-    <stop offset="0.55" stop-color="#f0abfc"/>
-    <stop offset="0.75" stop-color="#a855f7"/>
-    <stop offset="1" stop-color="#6d28d9"/>
-    <animateTransform attributeName="gradientTransform" type="translate" values="-{ART_W} 0; {ART_W} 0" dur="6s" repeatCount="indefinite"/>
-  </linearGradient>
-  <linearGradient id="grad2" gradientUnits="userSpaceOnUse" x1="{PADX}" y1="0" x2="{PADX+ART_W}" y2="0" spreadMethod="repeat">
-    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#e879f9"/><stop offset="1" stop-color="#7c3aed"/>
-    <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="{ART_W} 0" dur="4s" repeatCount="indefinite"/>
-  </linearGradient>
-  <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0" stop-color="#fff" stop-opacity="0"/>
-    <stop offset="0.5" stop-color="#fff" stop-opacity="0.55"/>
-    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-  </linearGradient>
-  <filter id="glow" x="-20%" y="-40%" width="140%" height="180%">
-    <feGaussianBlur stdDeviation="6" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
-  <pattern id="scan" width="4" height="4" patternUnits="userSpaceOnUse">
-    <rect width="4" height="2" fill="#000" opacity="0.12"/>
-  </pattern>
-  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#3b0764" stop-opacity="0.55"/><stop offset="1" stop-color="#0d1117" stop-opacity="0"/>
-  </linearGradient>
-  <radialGradient id="haze" cx="0.5" cy="0.62" r="0.6">
-    <stop offset="0" stop-color="#7c3aed" stop-opacity="0.28"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
-  </radialGradient>
-  <clipPath id="frame"><rect width="{W}" height="{H}" rx="14"/></clipPath>
-  <clipPath id="artclip">{"".join(r for _, r in blocks)}</clipPath>
-  <style>
-    .b {{ opacity:0; animation: in .5s cubic-bezier(.2,.8,.2,1) forwards; }}
-    @keyframes in {{ from {{ opacity:0; transform: translateY(-8px); }} to {{ opacity:1; transform:none; }} }}
-    .lines {{ opacity:0; animation: fade .8s .9s forwards; }}
-    @keyframes fade {{ to {{ opacity:1; }} }}
-    .cursor {{ animation: blink 1s steps(1) infinite; }}
-    @keyframes blink {{ 50% {{ opacity:0; }} }}
-    .sub {{ font: 600 13px 'JetBrains Mono','Fira Code',ui-monospace,Menlo,Consolas,monospace; letter-spacing: 3px; }}
-    .tw {{ animation: tw 3s ease-in-out infinite; }}
-    @keyframes tw {{ 0%,100% {{ opacity:.15; }} 50% {{ opacity:1; }} }}
-    .flick {{ animation: flick 5s infinite; }}
-    @keyframes flick {{ 0%,92%,100% {{ opacity:1; }} 93% {{ opacity:.6; }} 94% {{ opacity:1; }} 96% {{ opacity:.75; }} }}
-  </style>
-</defs>
-
-<rect width="{W}" height="{H}" rx="14" fill="#0d1117"/>
-<rect width="{W}" height="{H}" rx="14" fill="url(#haze)"/>
-{stars}
-{grid}
-<rect x="0.5" y="0.5" width="{W-1}" height="{H-1}" rx="14" fill="none" stroke="url(#grad2)" stroke-opacity="0.7"/>
-<circle cx="20" cy="18" r="5" fill="#ff5f56"/><circle cx="37" cy="18" r="5" fill="#ffbd2e"/><circle cx="54" cy="18" r="5" fill="#27c93f"/>
-
-<g class="flick">
-  <g class="lines" fill="none" stroke="#6b21a8" stroke-width="1.6" stroke-linecap="square">
-    <path d="{" ".join(lines)}"/>
-  </g>
-  <g fill="url(#grad)" filter="url(#glow)">
-{band_svg}
-  </g>
-  <g clip-path="url(#artclip)">
-    <rect x="-200" y="{PADY}" width="140" height="{6*CH}" fill="url(#sheen)" transform="skewX(-20)">
-      <animate attributeName="x" values="-200;{W+200}" dur="3.5s" begin="1.2s" repeatCount="indefinite"/>
-    </rect>
-  </g>
-</g>
-<rect width="{W}" height="{H}" rx="14" fill="url(#scan)" pointer-events="none"/>
-
-<rect x="{PADX-12}" y="{H-50}" width="{W-2*PADX+24}" height="32" rx="8" fill="#0d1117" fill-opacity="0.82" stroke="#7c3aed" stroke-opacity="0.5"/>
-<text class="sub" x="{PADX}" y="{H-29}" fill="#c084fc">~$ <tspan fill="#c9d1d9">developer · builder · AI enthusiast · Austria</tspan><tspan class="cursor" fill="#e879f9"> █</tspan></text>
-</svg>
-'''
-(here / "banner.svg").write_text(svg)
-print("\n".join(rows))
-print(W, H)
-
-# --- footer: static terminal showing `cat ~/banner.txt` -----------------------
-FY = 74                                  # top of the art
-fblocks, flines = [], []
-for ri, row in enumerate(rows):
-    for ci, ch in enumerate(row):
-        x, y = PADX + ci * CW, FY + ri * CH
-        if ch == "█":
-            fblocks.append(f'<rect x="{x}" y="{y}" width="{CW+0.4}" height="{CH+0.4}"/>')
-        elif ch in BOX:
-            flines.append(box_path(ch, x, y))
-FH = FY + 6 * CH + 96
-MONO = "'JetBrains Mono','Fira Code',ui-monospace,Menlo,Consolas,monospace"
-footer = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{FH}" viewBox="0 0 {W} {FH}" role="img" aria-label="$ cat ~/banner.txt: {TEXT}">
-<defs>
-  <linearGradient id="fg" gradientUnits="userSpaceOnUse" x1="{PADX}" y1="0" x2="{PADX+ART_W}" y2="0">
-    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#c084fc"/><stop offset="1" stop-color="#7c3aed"/>
-  </linearGradient>
-  <style>
-    text {{ font: 600 15px {MONO}; }}
-    .cursor {{ animation: blink 1s steps(1) infinite; }}
-    @keyframes blink {{ 50% {{ opacity:0; }} }}
-  </style>
-</defs>
-<rect width="{W}" height="{FH}" rx="14" fill="#0d1117"/>
-<rect x="0.5" y="0.5" width="{W-1}" height="{FH-1}" rx="14" fill="none" stroke="#7c3aed" stroke-opacity="0.7"/>
-<circle cx="20" cy="18" r="5" fill="#ff5f56"/><circle cx="37" cy="18" r="5" fill="#ffbd2e"/><circle cx="54" cy="18" r="5" fill="#27c93f"/>
-<text x="{PADX}" y="54" fill="#c084fc">$ <tspan fill="#c9d1d9">cat ~/banner.txt</tspan></text>
-<path d="{" ".join(flines)}" fill="none" stroke="#6b21a8" stroke-width="1.6" stroke-linecap="square"/>
-<g fill="url(#fg)">{"".join(fblocks)}</g>
-<text x="{PADX}" y="{FY + 6*CH + 44}" fill="#c084fc">$ <tspan fill="#c9d1d9">echo "keep building"</tspan></text>
-<text x="{PADX}" y="{FY + 6*CH + 70}" fill="#c9d1d9">keep building.<tspan class="cursor" fill="#e879f9"> █</tspan></text>
-</svg>
-'''
-(here / "footer.svg").write_text(footer)
+# --- palette (portfolio :root) -----------------------------------------------------
+BG, INK = "#FCFBF8", "#17140F"
+MUTED, FAINT, LINE = 0.56, 0.34, 0.12          # ink opacities
+W, PAD = 880, 64
+EASE = "cubic-bezier(.33,1,.68,1)"
 
 
-# --- shared card chrome --------------------------------------------------------
+# --- fonts -------------------------------------------------------------------------
+class Font:
+    def __init__(self, family, file):
+        self.family, self.path = family, HERE / "fonts" / file
+        tt = TTFont(self.path)
+        self.cmap, self.hmtx = tt.getBestCmap(), tt["hmtx"].metrics
+        self.upm = tt["head"].unitsPerEm
+        self.used = set()
+
+    def width(self, text, size, ls=0.0):
+        adv = sum(self.hmtx[self.cmap.get(ord(c), ".notdef")][0] for c in text)
+        return adv * size / self.upm + ls * size * max(len(text) - 1, 0)
+
+    def face(self):
+        opts = subset.Options()
+        opts.flavor, opts.layout_features = "woff2", ["kern", "liga"]
+        sub = subset.Subsetter(opts)
+        tt = TTFont(self.path)
+        sub.populate(text="".join(sorted(self.used)) + " ")
+        sub.subset(tt)
+        buf = io.BytesIO()
+        tt.flavor = "woff2"
+        tt.save(buf)
+        b64 = base64.b64encode(buf.getvalue()).decode()
+        return f"@font-face {{ font-family: '{self.family}'; src: url(data:font/woff2;base64,{b64}) format('woff2'); }}"
+
+
 def esc(t):
     return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def chrome(w, h, title):
-    return f"""<rect width="{w}" height="{h}" rx="14" fill="#0d1117"/>
-<rect width="{w}" height="{h}" rx="14" fill="url(#haze)"/>
-<rect x="0.5" y="0.5" width="{w-1}" height="{h-1}" rx="14" fill="none" stroke="url(#edge)" stroke-opacity="0.8"/>
-<circle cx="20" cy="18" r="5" fill="#ff5f56"/><circle cx="37" cy="18" r="5" fill="#ffbd2e"/><circle cx="54" cy="18" r="5" fill="#27c93f"/>
-<text x="{w/2}" y="22" text-anchor="middle" class="t">{esc(title)}</text>"""
+class Card:
+    """One paper card. Collects elements and the glyphs each font needs."""
 
+    def __init__(self):
+        self.fonts = {
+            "display": Font("PDisplay", "league-gothic.ttf"),
+            "serif": Font("PSerif", "garamond-400.ttf"),
+            "serif5": Font("PSerif5", "garamond-500.ttf"),
+            "italic": Font("PItalic", "garamond-italic.ttf"),
+            "script": Font("PScript", "shadows.ttf"),
+        }
+        self.els, self.defs, self.anim = [], [], 0
 
-def defs(w, extra=""):
-    return f"""<defs>
-  <linearGradient id="edge" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="{w}" y2="0" spreadMethod="repeat">
-    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#e879f9"/><stop offset="1" stop-color="#7c3aed"/>
-    <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="{w} 0" dur="4s" repeatCount="indefinite"/>
-  </linearGradient>
-  <radialGradient id="haze" cx="0.15" cy="0.4" r="0.7">
-    <stop offset="0" stop-color="#7c3aed" stop-opacity="0.18"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
-  </radialGradient>
-  <linearGradient id="logo" gradientUnits="userSpaceOnUse" x1="40" y1="96" x2="240" y2="216">
-    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#c084fc"/><stop offset="1" stop-color="#f0abfc"/>
-  </linearGradient>
-  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
-    <feGaussianBlur stdDeviation="4" result="b"/>
-    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-  </filter>
-  <style>
-    text {{ font-family: {MONO}; }}
-    .t {{ font-size: 12px; fill: #6b7280; }}
-    .p {{ font-size: 15px; font-weight: 600; }}
-    .k {{ font-size: 14px; font-weight: 700; fill: #c084fc; }}
-    .v {{ font-size: 14px; fill: #c9d1d9; }}
-    .r {{ opacity:0; animation: rin .45s ease-out forwards; }}
-    @keyframes rin {{ from {{ opacity:0; transform: translateX(-10px); }} to {{ opacity:1; transform:none; }} }}
-    .cursor {{ animation: blink 1s steps(1) infinite; }}
-    @keyframes blink {{ 50% {{ opacity:0; }} }}
-    {extra}
-  </style>
-</defs>"""
+    def text(self, x, y, s, font="serif", size=18, op=1.0, ls=0.0, anchor="start", upper=False):
+        f = self.fonts[font]
+        s = s.upper() if upper else s
+        f.used.update(s)
+        if anchor == "middle":                      # center on glyphs, not trailing tracking
+            x, anchor = x - f.width(s, size, ls) / 2, "start"
+        attrs = f'x="{x:.1f}" y="{y:.1f}" font-family="{f.family}" font-size="{size}"'
+        if op != 1:
+            attrs += f' fill-opacity="{op}"'
+        if ls:
+            attrs += f' letter-spacing="{ls * size:.2f}"'
+        if anchor != "start":
+            attrs += f' text-anchor="{anchor}"'
+        self.els.append(f"<text {attrs}>{esc(s)}</text>")
 
+    def wrap(self, s, font, size, maxw):
+        f, lines, cur = self.fonts[font], [], ""
+        for word in s.split():
+            test = f"{cur} {word}".strip()
+            if f.width(test, size) > maxw and cur:
+                lines.append(cur)
+                cur = word
+            else:
+                cur = test
+        return lines + [cur]
 
-# --- whoami: neofetch-style card -------------------------------------------------
-LCW, LCH, LG = 11, 20, 2.2
-logo_rows = ["".join(GLYPHS[c][r] for c in "DW") for r in range(6)]
-LX, LY = 40, 96
-lrects, llines = [], []
-for ri, row in enumerate(logo_rows):
-    for ci, ch in enumerate(row):
-        x, y = LX + ci * LCW, LY + ri * LCH
-        if ch == "█":
-            lrects.append(f'<rect x="{x}" y="{y}" width="{LCW+0.6}" height="{LCH+0.6}"/>')
-        elif ch in BOX:
-            llines.append(box_path(ch, x, y, LCW, LCH, LG))
-logo_w = len(logo_rows[0]) * LCW
+    def para(self, x, y, s, font, size, maxw, lh, op=1.0):
+        for line in self.wrap(s, font, size, maxw):
+            self.text(x, y, line, font, size, op)
+            y += lh
+        return y
 
-INFO = [
-    ("name", "David Winkler"),
-    ("handle", "@999david7"),
-    ("location", "Austria · AT"),
-    ("school", "HTL Anichstraße"),
-    ("focus", "software · AI · automation"),
-    ("stack", "Python · TS · FastAPI · React · LLMs"),
-    ("status", "building ▸ learning ▸ experimenting"),
-    ("bugs", "questionable engineering decisions"),
-    ("motto", "“keep building.”"),
-]
-IX, IY, LH = LX + logo_w + 48, 92, 23
-WW = W
-info = [f'<text x="{IX}" y="{IY}" class="r p" style="animation-delay:.3s"><tspan fill="#e879f9">david</tspan><tspan fill="#6b7280">@</tspan><tspan fill="#a855f7">999david7</tspan></text>',
-        f'<rect x="{IX}" y="{IY+9}" width="{20*8.4:.0f}" height="1.5" fill="#7c3aed" class="r" style="animation-delay:.4s"/>']
-for i, (k, v) in enumerate(INFO):
-    y = IY + 30 + i * LH
-    info.append(f'<text x="{IX}" y="{y}" class="r" style="animation-delay:{0.5 + i*0.12:.2f}s"><tspan class="k">{k}</tspan><tspan x="{IX+92}" class="v">{esc(v)}</tspan></text>')
-py = IY + 30 + len(INFO) * LH
-PAL = ["#0d1117", "#3b0764", "#6b21a8", "#7c3aed", "#9333ea", "#a855f7", "#c084fc", "#e879f9", "#f0abfc", "#c9d1d9"]
-info.append("".join(f'<rect x="{IX + i*26}" y="{py - 8}" width="24" height="14" rx="2" fill="{c}" class="r" style="animation-delay:{0.5 + len(INFO)*0.12 + i*0.04:.2f}s"/>' for i, c in enumerate(PAL)))
-WH = py + 32
-whoami = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{WW}" height="{WH}" viewBox="0 0 {WW} {WH}" role="img" aria-label="whoami: David Winkler, @999david7, Austria, HTL Anichstra&#223;e">
-{defs(WW, ".float {{ animation: float 4s ease-in-out infinite; }} @keyframes float {{ 0%,100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-4px); }} }}".replace("{{", "{").replace("}}", "}"))}
-{chrome(WW, WH, "david@999david7: ~")}
-<text x="{LX}" y="58" class="p" fill="#c084fc">$ <tspan fill="#c9d1d9">neofetch</tspan></text>
-<g class="float">
-  <path d="{" ".join(llines)}" fill="none" stroke="#6b21a8" stroke-width="1.3" stroke-linecap="square"/>
-  <g fill="url(#logo)" filter="url(#glow)">{"".join(lrects)}</g>
-</g>
-{chr(10).join(info)}
+    def hline(self, y, x0=PAD, x1=W - PAD):
+        self.els.append(f'<rect x="{x0}" y="{y:.1f}" width="{x1 - x0}" height="1" fill="{INK}" fill-opacity="{LINE}"/>')
+
+    def label(self, y, s):
+        self.text(PAD, y, s, "serif", 15, FAINT, ls=0.26, upper=True)
+
+    def rise(self):
+        """Wrap everything added since the last call in a staggered fade-up."""
+        body = self.els[self.anim:]
+        del self.els[self.anim:]
+        n = len([e for e in self.els if e.startswith('<g class="in"')])
+        self.els.append(f'<g class="in" style="animation-delay:{0.1 + 0.14 * n:.2f}s">{"".join(body)}</g>')
+        self.anim = len(self.els)
+
+    def save(self, name, h, label):
+        faces = "\n".join(f.face() for f in self.fonts.values() if f.used)
+        svg = f"""<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{W}" height="{h:.0f}" viewBox="0 0 {W} {h:.0f}" role="img" aria-label="{esc(label)}">
+<defs>
+<style>
+{faces}
+text {{ fill: {INK}; }}
+.in {{ animation: rise 1.1s {EASE} both; }}
+@keyframes rise {{ from {{ opacity: 0; transform: translateY(14px); }} }}
+/* the signature writes itself in from left to right, like the portfolio footer */
+.sign {{ animation: write 1.6s cubic-bezier(.65,0,.35,1) .6s both; }}
+@keyframes write {{ from {{ clip-path: inset(0 100% 0 0); }} to {{ clip-path: inset(0 0 0 0); }} }}
+@media (prefers-reduced-motion: reduce) {{ * {{ animation: none !important; }} }}
+</style>
+{"".join(self.defs)}
+</defs>
+<rect x="0.5" y="0.5" width="{W - 1}" height="{h - 1:.0f}" rx="16" fill="{BG}" stroke="{INK}" stroke-opacity="0.08"/>
+{chr(10).join(self.els)}
 </svg>
 """
-(here / "whoami.svg").write_text(whoami)
+        (HERE / f"{name}.svg").write_text(svg)
+        print(f"{name}.svg  {len(svg) // 1024} KB")
 
 
-# --- projects: three neon cards ------------------------------------------------
-PROJECTS = [
-    ("01", "~/ai-automation", ["AI tools, agents and", "automation experiments."], ["Python", "FastAPI", "LLMs", "RAG"]),
-    ("02", "~/web", ["Apps, sites and", "experiments with ideas."], ["TypeScript", "React", "Next.js"]),
-    ("03", "~/random-stuff", ["Side projects and things", "I build because I can."], ["Python", "Docker", "Git"]),
-]
-GAP, CWD = 16, (W - 2 * 24 - 2 * 16) / 3
-PH = 214
-cards = []
-for n, (num, name, desc, tags) in enumerate(PROJECTS):
-    x0, y0 = 24 + n * (CWD + GAP), 52
-    ch_ = PH - y0 - 20
-    d = n * 0.25
-    tag_svg, tx, ty = [], x0 + 16, y0 + 88
-    for t in tags:
-        tw = len(t) * 6.8 + 16
-        if tx + tw > x0 + CWD - 12:
-            tx, ty = x0 + 16, ty + 22
-        tag_svg.append(f'<rect x="{tx:.1f}" y="{ty}" width="{tw:.1f}" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/>'
-                       f'<text x="{tx + tw/2:.1f}" y="{ty + 13}" text-anchor="middle" font-size="11" fill="#e9d5ff">{esc(t)}</text>')
-        tx += tw + 6
-    cards.append(f"""<g class="r" style="animation-delay:{0.2 + d:.2f}s">
-  <rect x="{x0:.1f}" y="{y0}" width="{CWD:.1f}" height="{ch_}" rx="12" fill="#161b22"/>
-  <rect x="{x0:.1f}" y="{y0}" width="{CWD:.1f}" height="{ch_}" rx="12" fill="none" stroke="url(#edge)" stroke-width="1.5" filter="url(#glow)" class="pulse" style="animation-delay:{d:.2f}s"/>
-  <text x="{x0 + CWD - 12:.1f}" y="{y0 + ch_ - 12}" text-anchor="end" font-size="44" font-weight="800" fill="#7c3aed" fill-opacity="0.16">{num}</text>
-  <text x="{x0 + 16:.1f}" y="{y0 + 28}" font-size="14" font-weight="700" fill="#e879f9">{esc(name)}</text>
-  <text x="{x0 + 16:.1f}" y="{y0 + 52}" font-size="12.5" fill="#9ca3af">{esc(desc[0])}</text>
-  <text x="{x0 + 16:.1f}" y="{y0 + 68}" font-size="12.5" fill="#9ca3af">{esc(desc[1])}</text>
-  {"".join(tag_svg)}
-</g>""")
-projects = f"""<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{PH}" viewBox="0 0 {W} {PH}" role="img" aria-label="Projects: AI and automation, web projects, random stuff">
-{defs(W, ".pulse { animation: pulse 3s ease-in-out infinite; } @keyframes pulse { 0%,100% { stroke-opacity:.35; } 50% { stroke-opacity:1; } }")}
-{chrome(W, PH, "~/projects")}
-{chr(10).join(cards)}
-</svg>
-"""
-(here / "projects.svg").write_text(projects)
+def rows(c, y, items, name_font, name_size, upper):
+    """Portfolio .row list: name + note on the left, year on the right, hairlines between."""
+    for name, note, year in items:
+        c.hline(y)
+        top = y + 30
+        c.text(PAD, top + name_size * 0.72, name, name_font, name_size, ls=0.02 if upper else 0, upper=upper)
+        c.text(W - PAD, top + name_size * 0.72, year, "serif", 17, FAINT, anchor="end")
+        c.text(PAD, top + name_size * 0.72 + 30, note, "serif", 18, MUTED)
+        y = top + name_size * 0.72 + 30 + 28
+    c.hline(y)
+    return y
+
+
+# --- hero ----------------------------------------------------------------------------
+c = Card()
+c.text(W / 2, 74, QUOTE, "italic", 26, anchor="middle")
+c.rise()
+pw, ph, py = 140, 175, 120
+portrait = base64.b64encode((HERE / "portrait.webp").read_bytes()).decode()
+c.defs.append(f'<clipPath id="pc"><rect x="{(W - pw) / 2}" y="{py}" width="{pw}" height="{ph}" rx="14"/></clipPath>'
+              f'<filter id="sh" x="-50%" y="-50%" width="200%" height="200%"><feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="{INK}" flood-opacity="0.28"/></filter>')
+c.els.append(f'<rect x="{(W - pw) / 2 + 8}" y="{py + 8}" width="{pw - 16}" height="{ph - 16}" rx="14" fill="{BG}" filter="url(#sh)"/>'
+             f'<image href="data:image/webp;base64,{portrait}" x="{(W - pw) / 2}" y="{py}" width="{pw}" height="{ph}" '
+             f'preserveAspectRatio="xMidYMid slice" clip-path="url(#pc)"/>')
+c.rise()
+c.text(W / 2, py + ph + 132, NAME, "display", 128, ls=0.09, anchor="middle", upper=True)
+c.rise()
+for i, line in enumerate(CAPTION):
+    c.text(W / 2, py + ph + 192 + i * 40, line, "script", 32, anchor="middle")
+c.rise()
+c.save("hero", py + ph + 192 + 40 + 56, f"{QUOTE} {NAME} — {CAPTION[0]}, {CAPTION[1]}")
+
+# --- about + education -------------------------------------------------------------
+c = Card()
+c.label(PAD + 10, "About")
+c.rise()
+y = c.para(PAD, PAD + 62, LEAD, "serif", 27, 640, 38)
+c.rise()
+for p in DIM:
+    y = c.para(PAD, y + 14, p, "serif", 23, 640, 33, MUTED)
+c.rise()
+y += 34
+c.label(y, "Education")
+y = rows(c, y + 30, EDUCATION, "serif", 30, False)
+c.rise()
+c.save("about", y + PAD - 10, "About David Winkler")
+
+# --- stack -----------------------------------------------------------------------------
+sprite = (HERE / "stack-icons.svg").read_text()
+symbols = dict(re.findall(r'<symbol id="([^"]+)" viewBox="0 0 24 24">(.*?)</symbol>', sprite, re.S))
+c = Card()
+c.label(PAD + 10, "Stack")
+c.hline(PAD + 38)
+c.rise()
+gap = 28
+colw = (W - 2 * PAD - 3 * gap) / 4
+bottom = 0
+for gi, (group, items) in enumerate(STACK):
+    x = PAD + gi * (colw + gap)
+    y = PAD + 80
+    c.text(x, y, group, "serif", 13, FAINT, ls=0.2, upper=True)
+    y += 22
+    for icon, brand, name in items:
+        c.els.append(f'<rect x="{x + 0.5:.1f}" y="{y + 0.5:.1f}" width="35" height="35" rx="10" fill="#fff" stroke="{INK}" stroke-opacity="{LINE}"/>'
+                     f'<g transform="translate({x + 8.5:.1f} {y + 8.5:.1f}) scale(0.8)" fill="{brand or INK}">{symbols[icon]}</g>')
+        c.text(x + 48, y + 24, name, "serif", 20)
+        y += 47
+    bottom = max(bottom, y)
+    c.rise()
+c.save("stack", bottom + PAD - 20, "Stack: " + "; ".join(f"{g}: " + ", ".join(n for *_, n in it) for g, it in STACK))
+
+# --- work ------------------------------------------------------------------------------
+c = Card()
+c.label(PAD + 10, "Work")
+c.rise()
+y = rows(c, PAD + 38, [(n, note, yr + "  ↗") for n, note, yr in WORK], "display", 50, True)
+c.rise()
+c.save("work", y + PAD - 10, "Work: " + "; ".join(f"{n} ({yr}) — {note}" for n, note, yr in WORK))
+
+# --- path + footer ---------------------------------------------------------------------
+c = Card()
+c.label(PAD + 10, "Path")
+c.rise()
+y = rows(c, PAD + 38, PATH, "serif5", 26, False)
+c.rise()
+fy = y + 130
+c.els.append('<g class="sign">')
+c.text(PAD, fy, NAME, "script", 50)
+c.els.append("</g>")
+lx = W / 2 + 20
+for i, link in enumerate(LINKS):
+    c.text(lx, fy - 66 + i * 27, link, "serif", 19, MUTED)
+c.text(W - PAD, fy + 14, COPY, "serif", 16, FAINT, anchor="end")
+c.save("contact", fy + 14 + PAD - 10, f"Path: {', '.join(p[0] for p in PATH)}. Signed, {NAME}.")
