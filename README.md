@@ -22,45 +22,11 @@
 
 ## `$ whoami`
 
-```yaml
-name:      David Winkler
-handle:    999david7
-location:  Austria 🇦🇹
-school:    HTL Anichstraße
-focus:     [software, AI, automation, whatever comes next]
-motto:     "keep building."
-```
+<img src="./assets/whoami.svg" width="100%" alt="neofetch: David Winkler, @999david7, Austria, HTL Anichstraße" />
 
 ## `$ ls ~/projects`
 
-<table>
-<tr>
-<td width="33%" valign="top">
-
-### 🤖 AI & Automation
-AI-powered tools, agents and automation experiments.
-
-<sub>`Python` `FastAPI` `LLMs` `RAG`</sub>
-
-</td>
-<td width="33%" valign="top">
-
-### 🌐 Web Projects
-Building applications and experimenting with new ideas.
-
-<sub>`TypeScript` `React` `Next.js`</sub>
-
-</td>
-<td width="33%" valign="top">
-
-### 🧪 Random Stuff
-Side projects and things I build because I can.
-
-<sub>`Python` `Docker` `Git`</sub>
-
-</td>
-</tr>
-</table>
+<img src="./assets/projects.svg" width="100%" alt="Projects: AI & automation, web, random stuff" />
 
 ## `$ cat ~/stack`
 
@@ -74,15 +40,6 @@ Side projects and things I build because I can.
 
 ```text
 ai/llm   →  OpenAI · Claude · Gemini · RAG
-```
-
-## `$ ./currently.sh`
-
-```diff
-+ building
-+ learning
-+ experimenting
-! making questionable engineering decisions
 ```
 
 ## `$ git log --stats`
