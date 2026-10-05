@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="716" height="214" viewBox="0 0 716 214" role="img" aria-label="Projects: AI and automation, web projects, random stuff">
+<defs>
+  <linearGradient id="edge" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="716" y2="0" spreadMethod="repeat">
+    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#e879f9"/><stop offset="1" stop-color="#7c3aed"/>
+    <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="716 0" dur="4s" repeatCount="indefinite"/>
+  </linearGradient>
+  <radialGradient id="haze" cx="0.15" cy="0.4" r="0.7">
+    <stop offset="0" stop-color="#7c3aed" stop-opacity="0.18"/><stop offset="1" stop-color="#7c3aed" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="logo" gradientUnits="userSpaceOnUse" x1="40" y1="96" x2="240" y2="216">
+    <stop offset="0" stop-color="#7c3aed"/><stop offset="0.5" stop-color="#c084fc"/><stop offset="1" stop-color="#f0abfc"/>
+  </linearGradient>
+  <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+    <feGaussianBlur stdDeviation="4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <style>
+    text { font-family: 'JetBrains Mono','Fira Code',ui-monospace,Menlo,Consolas,monospace; }
+    .t { font-size: 12px; fill: #6b7280; }
+    .p { font-size: 15px; font-weight: 600; }
+    .k { font-size: 14px; font-weight: 700; fill: #c084fc; }
+    .v { font-size: 14px; fill: #c9d1d9; }
+    .r { opacity:0; animation: rin .45s ease-out forwards; }
+    @keyframes rin { from { opacity:0; transform: translateX(-10px); } to { opacity:1; transform:none; } }
+    .cursor { animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+    .pulse { animation: pulse 3s ease-in-out infinite; } @keyframes pulse { 0%,100% { stroke-opacity:.35; } 50% { stroke-opacity:1; } }
+  </style>
+</defs>
+<rect width="716" height="214" rx="14" fill="#0d1117"/>
+<rect width="716" height="214" rx="14" fill="url(#haze)"/>
+<rect x="0.5" y="0.5" width="715" height="213" rx="14" fill="none" stroke="url(#edge)" stroke-opacity="0.8"/>
+<circle cx="20" cy="18" r="5" fill="#ff5f56"/><circle cx="37" cy="18" r="5" fill="#ffbd2e"/><circle cx="54" cy="18" r="5" fill="#27c93f"/>
+<text x="358.0" y="22" text-anchor="middle" class="t">~/projects</text>
+<g class="r" style="animation-delay:0.20s">
+  <rect x="24.0" y="52" width="212.0" height="142" rx="12" fill="#161b22"/>
+  <rect x="24.0" y="52" width="212.0" height="142" rx="12" fill="none" stroke="url(#edge)" stroke-width="1.5" filter="url(#glow)" class="pulse" style="animation-delay:0.00s"/>
+  <text x="224.0" y="182" text-anchor="end" font-size="44" font-weight="800" fill="#7c3aed" fill-opacity="0.16">01</text>
+  <text x="40.0" y="80" font-size="14" font-weight="700" fill="#e879f9">~/ai-automation</text>
+  <text x="40.0" y="104" font-size="12.5" fill="#9ca3af">AI tools, agents and</text>
+  <text x="40.0" y="120" font-size="12.5" fill="#9ca3af">automation experiments.</text>
+  <rect x="40.0" y="140" width="56.8" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="68.4" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">Python</text><rect x="102.8" y="140" width="63.6" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="134.6" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">FastAPI</text><rect x="172.4" y="140" width="43.2" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="194.0" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">LLMs</text><rect x="40.0" y="162" width="36.4" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="58.2" y="175" text-anchor="middle" font-size="11" fill="#e9d5ff">RAG</text>
+</g>
+<g class="r" style="animation-delay:0.45s">
+  <rect x="252.0" y="52" width="212.0" height="142" rx="12" fill="#161b22"/>
+  <rect x="252.0" y="52" width="212.0" height="142" rx="12" fill="none" stroke="url(#edge)" stroke-width="1.5" filter="url(#glow)" class="pulse" style="animation-delay:0.25s"/>
+  <text x="452.0" y="182" text-anchor="end" font-size="44" font-weight="800" fill="#7c3aed" fill-opacity="0.16">02</text>
+  <text x="268.0" y="80" font-size="14" font-weight="700" fill="#e879f9">~/web</text>
+  <text x="268.0" y="104" font-size="12.5" fill="#9ca3af">Apps, sites and</text>
+  <text x="268.0" y="120" font-size="12.5" fill="#9ca3af">experiments with ideas.</text>
+  <rect x="268.0" y="140" width="84.0" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="310.0" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">TypeScript</text><rect x="358.0" y="140" width="50.0" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="383.0" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">React</text><rect x="268.0" y="162" width="63.6" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="299.8" y="175" text-anchor="middle" font-size="11" fill="#e9d5ff">Next.js</text>
+</g>
+<g class="r" style="animation-delay:0.70s">
+  <rect x="480.0" y="52" width="212.0" height="142" rx="12" fill="#161b22"/>
+  <rect x="480.0" y="52" width="212.0" height="142" rx="12" fill="none" stroke="url(#edge)" stroke-width="1.5" filter="url(#glow)" class="pulse" style="animation-delay:0.50s"/>
+  <text x="680.0" y="182" text-anchor="end" font-size="44" font-weight="800" fill="#7c3aed" fill-opacity="0.16">03</text>
+  <text x="496.0" y="80" font-size="14" font-weight="700" fill="#e879f9">~/random-stuff</text>
+  <text x="496.0" y="104" font-size="12.5" fill="#9ca3af">Side projects and things</text>
+  <text x="496.0" y="120" font-size="12.5" fill="#9ca3af">I build because I can.</text>
+  <rect x="496.0" y="140" width="56.8" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="524.4" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">Python</text><rect x="558.8" y="140" width="56.8" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="587.2" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">Docker</text><rect x="621.6" y="140" width="36.4" height="18" rx="9" fill="#2e1065" stroke="#7c3aed" stroke-opacity="0.7"/><text x="639.8" y="153" text-anchor="middle" font-size="11" fill="#e9d5ff">Git</text>
+</g>
+</svg>
